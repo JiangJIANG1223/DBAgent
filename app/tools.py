@@ -162,7 +162,7 @@ def delete_data(field: str, value: str, db: Session) -> str:
 
 
 ### image process and analysis
-vaa3d_exe = 'C:\\Users\\kaixiang\\Desktop\\Vaa3D-x.1.1.2_Windows_64bit\\Vaa3D-x.exe'
+vaa3d_exe = "Path\\to\\your\\Vaa3D-x.exe"
 
 # 定义输出目录并确保其存在
 output_dir = '.\\results'
@@ -288,43 +288,33 @@ def display_images(image_path_or_paths: Union[str, List[str]]) -> Union[str, Lis
     else:
         return "Error: Invalid input type for display_image. Must be str or list."
 
-def preprocess_image(image_path_or_paths: Union[str, List[str]], 
-                     method: str = "gaussian_filter", 
-                     pipeline_dir: Optional[str] = None, 
-                     **kwargs
-                     ) -> Union[str, List[str]]:
+def preprocess_image(image_path_or_paths: Union[str, List[str]],
+                     pipeline_dir: Optional[str] = None) -> Union[str, List[str]]:
     """
-    Preprocess one or multiple images with a chosen method (gaussian_filter or image_enhancement).
-    If pipeline_dir is given, outputs go to pipeline_dir/preprocessing/.
-    Otherwise fall back to ./results/preprocessing/.
+    Preprocess one or multiple images using the Vaa3D imPreProcess plugin.
+    If pipeline_dir is provided, outputs will be saved to pipeline_dir/preprocessing/,
+    otherwise, outputs will be saved to ./results/preprocessing/.
     """
-    # 1) 建立子目录
+    # 1) Create the output subdirectory
     sub_dir = _make_subdir(pipeline_dir, "preprocessing")
 
     def _preprocess_single_image(image_path: str) -> str:
-        img = cv2.imread(image_path)
-        if img is None:
-            return f"Error: Cannot read image at {image_path}"
-
-        if method == "gaussian_filter":
-            # 参数：ksize默认为5
-            ksize = kwargs.get("ksize", 5)
-            img = cv2.GaussianBlur(img, (ksize, ksize), 0)
-        elif method == "image_enhancement":
-            alpha = kwargs.get("alpha", 1.2)  # 对比度
-            beta = kwargs.get("beta", 20)    # 亮度
-            # new_pixel = alpha * old_pixel + beta
-            img = cv2.convertScaleAbs(img, alpha=alpha, beta=beta)
-        
-        # 其他预处理方法
-
         base_name = os.path.basename(image_path)
         name_no_ext, ext = os.path.splitext(base_name)
         output_file_name = f"{name_no_ext}_preprocessed{ext}"
         output_path = os.path.join(sub_dir, output_file_name)
-        cv2.imwrite(output_path, img)
+        # Build the command to call the Vaa3D plugin
+        cmd = [
+            "Vaa3D-x.exe", "/x", "imPreProcess", "/f", "im_enhancement",
+            "/i", image_path, "/o", output_path,
+            "/p", "3", "1", "35", "3", "25", "1", "1"
+        ]
+        try:
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            return f"Error: Vaa3D plugin pre-processing failed for {image_path}: {str(e)}"
         return output_path
-    
+
     # 判断输入是单个字符串还是列表
     if isinstance(image_path_or_paths, str):
         return _preprocess_single_image(image_path_or_paths)
@@ -406,8 +396,7 @@ def postprocess_results(swc_path_or_paths: Union[str, List[str]],
 def _parse_single_swc_stdout(raw_stdout: str) -> str:
     """
     从 compute_feature 命令的标准输出 (raw_stdout) 中，提取或整理想要展示的特征内容。
-    这里做一个示例：仅截取从 '--------------Neuron #1----------------' 到 'Hausdorff Dimension:' 所在行。
-    你可根据实际输出格式做更精细的解析或排版。
+    仅截取从 '--------------Neuron #1----------------' 到 'Hausdorff Dimension:' 所在行。
     """
     lines = raw_stdout.splitlines()
     start_idx = None
@@ -482,7 +471,7 @@ def extract_features(swc_path_or_paths: Union[str, List[str]],
 # 可以用一个字典映射名称 -> 函数
 TOOLS_REGISTRY = {
     "search_by_id": search_by_id,
-    "search_by_criteria": search_by_criteria,  # 新增
+    "search_by_criteria": search_by_criteria, 
     "display_images": display_images,
     "preprocess_image": preprocess_image,
     "auto_tracing": auto_tracing,

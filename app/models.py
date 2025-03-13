@@ -1,9 +1,7 @@
 # 定义了数据库模型HumanSingleCellTrackingTable，该模型与MySQL中的Human_SingleCell_TrackingTable表对应
 
-from sqlalchemy import Column, String, Integer, Text, Date, TIMESTAMP, func, DateTime, ForeignKey, Enum, UniqueConstraint,Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
 
 Base = declarative_base()
     

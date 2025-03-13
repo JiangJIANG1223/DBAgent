@@ -137,9 +137,6 @@ async def determine_question_category(question: str) -> int:
     response = await call_large_language_model(prompt)
     print("原始响应: \n\n", response)
 
-    # matches = re.findall(r'<([12])>', response)
-    # print("matches: ", matches)
-
     # Extract the category number from the response
     try:
         print("try to recognize the category: ")
@@ -198,10 +195,9 @@ You have these tools available:
    - For example, field="brain_region" with value="MFG", or field="dye" with value="Alexa488".
    - Returns a list of image paths or an error message.
 
-3) preprocess_image(image_path_or_paths: Union[str, List[str]], method="gaussian_filter", **kwargs) -> Union[str, List[str]]
-   - Preprocesses one or multiple images.
-   - Default method is "gaussian_filter". Another method example is "image_enhancement".
-   - Returns the preprocessed image path(s).
+3) preprocess_image(image_path_or_paths: Union[str, List[str]]) -> Union[str, List[str]]
+  - Preprocesses one or multiple images using the Vaa3D imPreProcess plugin.
+  - Returns the path(s) of the preprocessed image file(s) or an error message.
 
 4) auto_tracing(image_path_or_paths: Union[str, List[str]]) -> Union[str, List[str]]
    - Automatically traces one or multiple images using Vaa3D, generating SWC file(s).
@@ -268,36 +264,11 @@ JSON output:
 }}
 
 EXAMPLE B:
-User wants: "Preprocess the image of cell 00123 using gaussian filter with ksize=7"
-We want steps to do:
-1) search_by_id(cell_id=00123)
-2) preprocess_image(image_path_or_paths=<the path from step1>, method="gaussian_filter", ksize=7)
-
-JSON output:
-{{
-  "steps": [
-    {{
-      "tool_name": "search_by_id",
-      "arguments": {{
-        "cell_id": "00123"
-      }}
-    }},
-    {{
-      "tool_name": "preprocess_image",
-      "arguments": {{
-        "image_path_or_paths": "PLACEHOLDER_FROM_STEP1",
-        "method": "gaussian_filter",
-        "ksize": 7
-      }}
-    }}
-  ]
-}}
-
-EXAMPLE C:
 User wants: "Auto trace the data for brain region MFG"
 We want steps to do:
 1) search_by_criteria(field=brain_region, value=MFG)
-2) auto_tracing(image_path_or_paths=<the paths from step1>)
+2) preprocess_image(image_path_or_paths=<the path from step1>)
+3) auto_tracing(image_path_or_paths=<the paths from step2>)
 
 JSON output:
 {{
@@ -310,15 +281,21 @@ JSON output:
       }}
     }},
     {{
+      "tool_name": "preprocess_image",
+      "arguments": {{
+        "image_path_or_paths": "PLACEHOLDER_FROM_STEP1",
+      }}
+    }},
+    {{
       "tool_name": "auto_tracing",
       "arguments": {{
-        "image_path_or_paths": "PLACEHOLDER_FROM_STEP1"
+        "image_path_or_paths": "PLACEHOLDER_FROM_STEP2"
       }}
     }}
   ]
 }}
 
-EXAMPLE D:
+EXAMPLE C:
 User wants: "Compute the morphology features of cell 25213."
 We want steps to do:
 1) search_by_id(cell_id=25213)
@@ -356,7 +333,7 @@ JSON output:
   ]
 }}
 
-EXAMPLE E
+EXAMPLE D
 User wants: "Display all the images of region MFG."
 We want steps to do:
 1) search_by_criteria(field=brain_region, value=MFG)
@@ -381,7 +358,7 @@ JSON output:
   ]
 }}
 
-EXAMPLE F:
+EXAMPLE E:
 User wants: "Insert data from local CSV 'C:/data/new_cells.csv' into the database"
 
 JSON output:
@@ -396,7 +373,7 @@ JSON output:
   ]
 }}
 
-EXAMPLE G:
+EXAMPLE F:
 User wants: "Update dye name to 'Cascade Blue' for cell 12345"
 
 JSON output:
