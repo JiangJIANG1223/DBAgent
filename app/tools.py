@@ -191,7 +191,7 @@ def search_by_id(cell_id: str, db: Session) -> str:
     cell_id = cell_id.zfill(5)
     try:
         ## 查询数据库
-        image_path = db.query(models.HumanSingleCellTrackingTable.image_file).filter(
+        image_path = db.query(models.HumanSingleCellTrackingTable.v3dpbd_file).filter(
             models.HumanSingleCellTrackingTable.cell_id == cell_id
         ).first()
         
@@ -226,7 +226,7 @@ def search_by_criteria(field: str, value: str, db: Session) -> List[str]:
 
         # 2) 查询数据库，可能返回多条
         rows = db.query(models.HumanSingleCellTrackingTable)\
-         .with_entities(models.HumanSingleCellTrackingTable.image_file)\
+         .with_entities(models.HumanSingleCellTrackingTable.v3dpbd_file)\
          .filter(query_column == value)\
          .all()
         
