@@ -584,7 +584,7 @@ async def call_large_language_model(prompt: str) -> str:
     :return: 模型生成的分类结果
     """
     client = AsyncOpenAI(
-        base_url='http://10.192.20.27:8888/v1',  # Ollama的OpenAI兼容API地址[5,7](@ref)
+        base_url='http://<your-ollama-host>:<port>/v1',  # Ollama的OpenAI兼容API地址[5,7](@ref)
         api_key='ollama'  # 本地部署无需真实key[5](@ref)
     )
 
@@ -611,7 +611,7 @@ async def call_large_language_model_with_context(prompt: str, context: list) -> 
     """
     # 初始化OpenAI客户端（需安装openai>=1.0）
     client = AsyncOpenAI(
-        base_url='http://10.192.20.27:8888/v1',  # Ollama的OpenAI兼容API地址
+        base_url='http://<your-ollama-host>:<port>/v1',  # Ollama的OpenAI兼容API地址
         api_key='ollama'  # 本地部署无需真实key，但参数必须存在
     )
 
