@@ -160,7 +160,6 @@ def delete_data(field: str, value: str, db: Session) -> str:
         db.rollback()
         return f"Error deleting data: {str(e)}"
 
-
 ### image process and analysis
 vaa3d_exe = "Path\\to\\your\\Vaa3D-x.exe"
 
@@ -468,7 +467,7 @@ def extract_features(swc_path_or_paths: Union[str, List[str]],
         return "Error: Invalid input type for extract_features (must be str or list)."
 
 
-# 可以用一个字典映射名称 -> 函数
+# 用一个字典映射名称 -> 函数
 TOOLS_REGISTRY = {
     "search_by_id": search_by_id,
     "search_by_criteria": search_by_criteria, 
@@ -480,5 +479,5 @@ TOOLS_REGISTRY = {
     "insert_data_from_csv": insert_data_from_csv,
     "retrieve_data": retrieve_data,
     "update_data": update_data,
-    "delete_data": delete_data,
+    "delete_data": delete_data
 }

@@ -207,9 +207,13 @@ You have these tools available:
    - Performs resampling or other post-processing on one or multiple SWC file(s) using Vaa3D.
    - Returns the resampled SWC path(s) or an error message.
 
-6) extract_features(swc_path_or_paths: Union[str, List[str]]) -> Union[str, List[str]]
-   - Extracts features from one or multiple SWC file(s) using Vaa3D, generating CSV file(s).
-   - Returns the path(s) to the CSV file(s) or an error message.
+6) extract_features(swc_path_or_paths: Union[str, List[str]], pipeline_dir: Optional[str] = None) -> Union[str, List[str]]
+  - Extracts features from one or multiple SWC file(s) using Vaa3D, generating CSV file(s).
+  - The extractable features include: Number of nodes, Soma surface, Number of stems, Number of bifurcations, Number of branches, 
+    Number of tips, Overall width, Overall height, Overall depth, Average diameter, Total length, Total surface, Total volume, 
+    Max Euclidean distance, Max path distance, Max branch order, Average contraction, Average fragmentation, Average parent-daughter ratio, 
+    Average bifurcation angle local, Average bifurcation angle remote, Hausdorff dimension.
+  - Returns either the text summary (for a single file) or the CSV file path (for multiple files), or an error message.
 
 7) insert_data_from_csv(csv_path: str, db: Session) -> str
    - Reads a local CSV file and inserts each row into the database table.
